@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ title }} - {{ date }}</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-light: #dbeafe;
+    --success: #16a34a;
+    --warning: #f59e0b;
+    --danger: #dc2626;
+    --bg: #f8fafc;
+    --card-bg: #ffffff;
+    --text: #1e293b;
+    --text-secondary: #64748b;
+    --border: #e2e8f0;
+    --radius: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+    color: white;
+    padding: 40px 32px;
+    border-radius: var(--radius);
+    margin-bottom: 24px;
+  }
+  .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  .header .subtitle { font-size: 14px; opacity: 0.85; }
+  .header .meta { display: flex; gap: 24px; margin-top: 16px; font-size: 13px; opacity: 0.8; }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--primary);
+  }
+  .stat-card .label { font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; }
+  .stat-card .value { font-size: 32px; font-weight: 700; color: var(--primary); }
+  .stat-card .suffix { font-size: 14px; color: var(--text-secondary); margin-left: 4px; }
+  .stat-card.domestic { border-left-color: #f97316; }
+  .stat-card.domestic .value { color: #f97316; }
+  .stat-card.international { border-left-color: #8b5cf6; }
+  .stat-card.international .value { color: #8b5cf6; }
+
+  /* Section */
+  .section {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .section-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .section-header h2 { font-size: 17px; font-weight: 600; }
+  .section-body { padding: 20px 24px; }
+
+  /* Bars */
+  .bar-chart { display: flex; flex-direction: column; gap: 10px; }
+  .bar-row { display: flex; align-items: center; gap: 12px; }
+  .bar-label { width: 120px; text-align: right; font-size: 13px; color: var(--text-secondary); flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar-track { flex: 1; height: 22px; background: #f1f5f9; border-radius: 6px; overflow: hidden; position: relative; }
+  .bar-fill { height: 100%; border-radius: 6px; transition: width .4s ease; }
+  .bar-fill.primary { background: linear-gradient(90deg, #3b82f6, #2563eb); }
+  .bar-fill.orange { background: linear-gradient(90deg, #fb923c, #f97316); }
+  .bar-fill.purple { background: linear-gradient(90deg, #a78bfa, #8b5cf6); }
+  .bar-fill.green { background: linear-gradient(90deg, #4ade80, #16a34a); }
+  .bar-value { width: 50px; font-size: 13px; font-weight: 600; text-align: right; flex-shrink: 0; }
+
+  /* Table */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 10px 12px; background: #f8fafc; color: var(--text-secondary); font-weight: 600; border-bottom: 2px solid var(--border); white-space: nowrap; }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  tr:hover td { background: #f8fafc; }
+
+  /* Tags */
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+  .tag-domestic { background: #fff7ed; color: #c2410c; }
+  .tag-international { background: #f5f3ff; color: #6d28d9; }
+
+  /* Category Grid */
+  .cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .cat-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    transition: box-shadow .2s;
+  }
+  .cat-card:hover { box-shadow: var(--shadow); }
+  .cat-card .cat-name { font-weight: 600; font-size: 15px; margin-bottom: 8px; }
+  .cat-card .cat-stats { display: flex; gap: 16px; font-size: 12px; color: var(--text-secondary); }
+  .cat-card .cat-stat strong { color: var(--text); font-size: 14px; }
+
+  /* Skills cloud */
+  .skill-cloud { display: flex; flex-wrap: wrap; gap: 6px; }
+  .skill-tag {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--primary-light);
+    color: var(--primary);
+  }
+
+  /* No data */
+  .no-data { text-align: center; padding: 40px; color: var(--text-secondary); }
+  .no-data .icon { font-size: 48px; margin-bottom: 12px; }
+
+  /* Footer */
+  .footer { text-align: center; padding: 24px; color: var(--text-secondary); font-size: 12px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <h1>{{ title }}</h1>
+    <div class="subtitle">国内外主流招聘平台自动化采集 · 每日人才需求分析</div>
+    <div class="meta">
+      <span>报告日期：{{ date }}</span>
+      <span>生成时间：{{ generated_at }}</span>
+      <span>数据源：{{ data.data_source_count }} 个平台</span>
+    </div>
+  </div>
+
+  {% set summary = data.summary %}
+  <!-- Stats Overview -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="label">采集岗位总数</div>
+      <div class="value">{{ summary.total_jobs }}<span class="suffix">个</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="label">预计招聘人数</div>
+      <div class="value">{{ summary.total_estimated_headcount }}<span class="suffix">人</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="label">涉及公司</div>
+      <div class="value">{{ summary.unique_companies }}<span class="suffix">家</span></div>
+    </div>
+    {% set dr = data.by_region %}
+    <div class="stat-card domestic">
+      <div class="label">国内平台 <span class="tag tag-domestic">DOMESTIC</span></div>
+      <div class="value">{{ dr.domestic.jobs if dr.domestic else 0 }}<span class="suffix">个岗位</span></div>
+    </div>
+    <div class="stat-card international">
+      <div class="label">国际平台 <span class="tag tag-international">INTERNATIONAL</span></div>
+      <div class="value">{{ dr.international.jobs if dr.international else 0 }}<span class="suffix">个岗位</span></div>
+    </div>
+  </div>
+
+  {% if summary.total_jobs == 0 %}
+  <div class="section">
+    <div class="no-data">
+      <div class="icon">📭</div>
+      <p>暂无数据</p>
+      <p style="font-size:12px;margin-top:8px">请检查平台连接或稍后重试</p>
+    </div>
+  </div>
+  {% else %}
+
+  <!-- By Platform -->
+  <div class="section">
+    <div class="section-header"><h2>各平台采集统计</h2></div>
+    <div class="section-body">
+      <div class="bar-chart">
+        {% set max_platform = data.by_platform.values()|max if data.by_platform else 1 %}
+        {% for platform, count in data.by_platform.items() %}
+        {% set pct = (count / max_platform * 100)|round if max_platform > 0 else 0 %}
+        <div class="bar-row">
+          <span class="bar-label">{{ platform }}</span>
+          <div class="bar-track">
+            <div class="bar-fill primary" style="width:{{ pct }}%"></div>
+          </div>
+          <span class="bar-value">{{ count }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- By Category -->
+  <div class="section">
+    <div class="section-header"><h2>职位类别分布</h2><span style="font-size:13px;color:var(--text-secondary)">共 {{ data.by_category|length }} 个类别</span></div>
+    <div class="section-body">
+      <div class="cat-grid">
+        {% for cat, count in data.by_category.items() %}
+        {% set detail = data.category_detail.get(cat, {}) %}
+        <div class="cat-card">
+          <div class="cat-name">{{ cat }}</div>
+          <div class="cat-stats">
+            <div class="cat-stat">岗位 <strong>{{ count }}</strong></div>
+            {% if detail.companies %}<div class="cat-stat">公司 <strong>{{ detail.companies }}</strong></div>{% endif %}
+            {% if detail.estimated_headcount %}<div class="cat-stat">招聘 <strong>{{ detail.estimated_headcount }}</strong>人</div>{% endif %}
+            {% if detail.percentage %}<div class="cat-stat">占比 <strong>{{ detail.percentage }}%</strong></div>{% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <!-- Bar chart for categories -->
+      <div class="bar-chart" style="margin-top:20px">
+        {% set max_cat = data.by_category.values()|max if data.by_category else 1 %}
+        {% for cat, count in data.by_category.items() %}
+        {% set pct = (count / max_cat * 100)|round if max_cat > 0 else 0 %}
+        <div class="bar-row">
+          <span class="bar-label">{{ cat }}</span>
+          <div class="bar-track">
+            <div class="bar-fill orange" style="width:{{ pct }}%"></div>
+          </div>
+          <span class="bar-value">{{ count }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Companies -->
+  <div class="section">
+    <div class="section-header"><h2>招聘需求 Top 20 公司</h2></div>
+    <div class="section-body">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>公司名称</th><th>发布岗位数</th><th>预计招聘人数</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in data.top_companies %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ c.name }}</td>
+              <td><strong>{{ c.jobs }}</strong></td>
+              <td>{{ c.estimated_headcount }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hot Skills -->
+  <div class="section">
+    <div class="section-header"><h2>热门技能需求 Top {{ data.top_skills|length }}</h2></div>
+    <div class="section-body">
+      <div class="skill-cloud" style="margin-bottom:16px">
+        {% for s in data.top_skills %}
+        <span class="skill-tag">{{ s.name }} ({{ s.count }})</span>
+        {% endfor %}
+      </div>
+      <div class="bar-chart">
+        {% set max_skill = data.top_skills[0].count if data.top_skills else 1 %}
+        {% for s in data.top_skills[:15] %}
+        {% set pct = (s.count / max_skill * 100)|round if max_skill > 0 else 0 %}
+        <div class="bar-row">
+          <span class="bar-label">{{ s.name }}</span>
+          <div class="bar-track">
+            <div class="bar-fill purple" style="width:{{ pct }}%"></div>
+          </div>
+          <span class="bar-value">{{ s.count }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- By Location -->
+  {% if data.by_location %}
+  <div class="section">
+    <div class="section-header"><h2>城市/地区需求分布</h2></div>
+    <div class="section-body">
+      <div class="bar-chart">
+        {% set max_loc = data.by_location.values()|max if data.by_location else 1 %}
+        {% for loc, count in data.by_location.items() %}
+        {% set pct = (count / max_loc * 100)|round if max_loc > 0 else 0 %}
+        <div class="bar-row">
+          <span class="bar-label">{{ loc }}</span>
+          <div class="bar-track">
+            <div class="bar-fill green" style="width:{{ pct }}%"></div>
+          </div>
+          <span class="bar-value">{{ count }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Hot Keywords -->
+  {% if data.top_keywords %}
+  <div class="section">
+    <div class="section-header"><h2>职位标题高频关键词</h2></div>
+    <div class="section-body">
+      <div class="skill-cloud">
+        {% for kw in data.top_keywords[:30] %}
+        <span class="skill-tag">{{ kw.word }} ({{ kw.count }})</span>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Salary Analysis -->
+  {% if data.salary_analysis.has_data %}
+  <div class="section">
+    <div class="section-header"><h2>薪资分析（月薪/K）</h2></div>
+    <div class="section-body">
+      <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr))">
+        <div class="stat-card"><div class="label">最低</div><div class="value">{{ data.salary_analysis.min }}<span class="suffix">K</span></div></div>
+        <div class="stat-card"><div class="label">最高</div><div class="value">{{ data.salary_analysis.max }}<span class="suffix">K</span></div></div>
+        <div class="stat-card"><div class="label">中位数</div><div class="value">{{ data.salary_analysis.median }}<span class="suffix">K</span></div></div>
+        <div class="stat-card"><div class="label">平均</div><div class="value">{{ data.salary_analysis.avg }}<span class="suffix">K</span></div></div>
+        <div class="stat-card"><div class="label">样本数</div><div class="value">{{ data.salary_analysis.count }}<span class="suffix">条</span></div></div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% endif %}
+
+  <!-- Footer -->
+  <div class="footer">
+    全球人才需求扫描器 v1.0 · 自动采集于 {{ generated_at }} · 数据仅供参考
+  </div>
+</div>
+
+</body>
+</html>

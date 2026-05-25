@@ -1,0 +1,190 @@
+# 人才需求采集工具 - 配置文件
+# 版本: v1.0
+
+# 全局设置
+global:
+  output_dir: "./reports"           # 报告输出目录
+  data_dir: "./data"                # 数据缓存目录
+  log_dir: "./logs"                 # 日志目录
+  request_delay: 2                  # 请求间隔（秒），避免被封IP
+  max_retries: 3                    # 请求重试次数
+  timeout: 30                       # 请求超时（秒）
+  user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) TalentScanner/1.0"
+
+# 国内招聘平台
+domestic:
+  # Boss直聘
+  boss_zhipin:
+    enabled: true
+    base_url: "https://www.zhipin.com"
+    # 需要手动配置搜索关键词
+    search_keywords:
+      - "Java开发工程师"
+      - "Python开发工程师"
+      - "前端开发工程师"
+      - "数据分析师"
+      - "AI算法工程师"
+      - "产品经理"
+      - "运维工程师"
+      - "测试工程师"
+    cities:
+      - "北京"
+      - "上海"
+      - "深圳"
+      - "杭州"
+      - "广州"
+      - "成都"
+    # Boss直聘使用REST API采集（需处理反爬）
+    api_endpoint: "https://www.zhipin.com/wapi/zpgeek/search/joblist.json"
+
+  # 猎聘
+  liepin:
+    enabled: true
+    base_url: "https://www.liepin.com"
+    search_keywords:
+      - "Java"
+      - "Python"
+      - "前端"
+      - "大数据"
+      - "人工智能"
+      - "产品经理"
+      - "架构师"
+      - "算法工程师"
+    cities:
+      - "北京"
+      - "上海"
+      - "深圳"
+      - "杭州"
+
+  # 智联招聘
+  zhilian:
+    enabled: true
+    base_url: "https://www.zhaopin.com"
+    search_keywords:
+      - "Java开发"
+      - "Python开发"
+      - "前端开发"
+      - "数据分析"
+      - "人工智能"
+      - "产品经理"
+      - "软件测试"
+      - "运维"
+
+  # 拉勾
+  lagou:
+    enabled: true
+    base_url: "https://www.lagou.com"
+    search_keywords:
+      - "Java"
+      - "Python"
+      - "前端"
+      - "数据"
+      - "AI"
+      - "产品经理"
+      - "测试"
+
+# 国际招聘平台
+international:
+  # LinkedIn
+  linkedin:
+    enabled: true
+    base_url: "https://www.linkedin.com"
+    # LinkedIn Jobs API
+    search_keywords:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Machine Learning Engineer"
+      - "Product Manager"
+      - "DevOps Engineer"
+      - "Full Stack Developer"
+      - "AI Engineer"
+      - "Cloud Architect"
+    locations:
+      - "United States"
+      - "United Kingdom"
+      - "Germany"
+      - "Singapore"
+      - "Japan"
+      - "Canada"
+
+  # Indeed
+  indeed:
+    enabled: true
+    base_url: "https://www.indeed.com"
+    search_keywords:
+      - "software engineer"
+      - "data scientist"
+      - "machine learning"
+      - "product manager"
+      - "devops"
+      - "full stack developer"
+      - "AI engineer"
+      - "cloud architect"
+    locations:
+      - "Remote"
+      - "New York"
+      - "San Francisco"
+      - "London"
+      - "Berlin"
+      - "Singapore"
+
+  # Glassdoor
+  glassdoor:
+    enabled: true
+    base_url: "https://www.glassdoor.com"
+    search_keywords:
+      - "Software Engineer"
+      - "Data Scientist"
+      - "Product Manager"
+      - "Machine Learning Engineer"
+
+# 报告配置
+report:
+  # 报告格式: html, json, csv, all
+  formats: ["html", "json", "csv"]
+  # 报告标题
+  title: "全球人才需求日报"
+  # 是否按职位类别分组
+  group_by_category: true
+  # 是否展示趋势图（需要至少7天数据）
+  show_trends: true
+  # 热门关键词Top N
+  top_skills_n: 20
+  # 是否包含薪资信息
+  include_salary: true
+
+# 职位类别映射（用于AI相关职位的智能分类）
+categories:
+  AI与数据:
+    - "AI"
+    - "机器学习"
+    - "深度学习"
+    - "数据科学"
+    - "NLP"
+    - "计算机视觉"
+    - "算法"
+    - "数据工程"
+  Web与移动:
+    - "前端"
+    - "后端"
+    - "全栈"
+    - "移动端"
+    - "React"
+    - "Vue"
+    - "Angular"
+  ���计算与DevOps:
+    - "DevOps"
+    - "SRE"
+    - "云原生"
+    - "Kubernetes"
+    - "Docker"
+    - "CI/CD"
+  产品与管理:
+    - "产品经理"
+    - "项目经理"
+    - "技术管理"
+    - "Scrum Master"
+  安全:
+    - "安全工程师"
+    - "渗透测试"
+    - "安全架构"
